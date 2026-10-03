@@ -7,7 +7,7 @@ import PanelLateralFijo from '../componentes/PanelLateralFijo'
 import GraficaLinea from '../graficas/GraficaLinea'
 import GraficaBarras from '../graficas/GraficaBarras'
 import GraficaIndexada from '../graficas/GraficaIndexada'
-import { obtenerSucursales, obtenerMetricas, obtenerRankingSucursales } from '../api'
+import { obtenerSucursales, obtenerCampanas, obtenerMetricas, obtenerRankingSucursales } from '../api'
 import { formatoFecha } from '../graficas/escalas'
 import { METRICAS_FB, conMetricasDerivadas, hoyISO, haceDiasISO } from '../configMetricas'
 
@@ -23,10 +23,21 @@ export default function VistaSucursal() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    obtenerSucursales()
+    obtenerSucursales().then(setSucursales).catch((e) => setError(e.message))
+
+    // La sucursal de arranque NO es la primera de la lista: esa es la
+    // primera alfabeticamente, y puede ser una que lleve meses sin
+    // campana -- se entraria a la pestana con las tres graficas vacias
+    // sin saber por que. Se arranca en la sucursal de la campana activa
+    // mas reciente, que es la que con mas seguridad tiene algo que
+    // ensenar en el rango por omision (los ultimos 30 dias).
+    //
+    // obtenerCampanas() ya viene ordenada por fecha de inicio
+    // descendente, asi que la primera sin fecha de fin es justo esa.
+    obtenerCampanas()
       .then((lista) => {
-        setSucursales(lista)
-        if (lista.length) setSucursal((s) => s || lista[0])
+        const reciente = lista.find((c) => !c.fecha_fin) ?? lista[0]
+        if (reciente) setSucursal((s) => s || reciente.sucursal)
       })
       .catch((e) => setError(e.message))
   }, [])
@@ -56,6 +67,10 @@ export default function VistaSucursal() {
   }, [granularidad, metrica])
 
   const puntos = useMemo(() => conMetricasDerivadas(datos?.puntos ?? []), [datos])
+  // datos === null es "la peticion sigue en el aire"; datos con puntos
+  // vacios es "esta sucursal no tuvo nada en este rango". Son cosas
+  // distintas y el usuario tiene que poder distinguirlas.
+  const cargando = datos === null
   const metricaActual = METRICAS_FB.find((m) => m.campo === metrica)
   const resumen = useMemo(() => resumenContrataciones(puntos), [puntos])
 
@@ -113,7 +128,9 @@ export default function VistaSucursal() {
             </div>
             {puntos.length > 0
               ? <GraficaLinea puntos={puntos} campo={metrica} etiqueta={metricaActual?.etiqueta} formateador={metricaActual?.formateador} granularidad={granularidad} />
-              : <div className="tarjeta-vacia">Cargando…</div>}
+              : <div className="tarjeta-vacia">
+                  {cargando ? 'Cargando…' : 'Esta sucursal no tuvo campañas ni solicitudes en el rango seleccionado'}
+                </div>}
           </div>
 
           <div className="tarjeta">
@@ -121,7 +138,9 @@ export default function VistaSucursal() {
             <p className="subt">Por {granularidad} · {sucursal || '—'}</p>
             {puntos.length > 0
               ? <GraficaBarras puntos={puntos} campo="solicitantes" granularidad={granularidad} />
-              : <div className="tarjeta-vacia">Cargando…</div>}
+              : <div className="tarjeta-vacia">
+                  {cargando ? 'Cargando…' : 'Sin solicitudes en este periodo'}
+                </div>}
           </div>
 
           <div className="tarjeta">
@@ -129,7 +148,9 @@ export default function VistaSucursal() {
             <p className="subt">Por {granularidad} · {sucursal || '—'} · comparación en una sola escala, no en pesos ni conteos</p>
             {puntos.length > 0
               ? <GraficaIndexada puntos={puntos} campoMetrica={metrica} etiquetaMetrica={metricaActual?.etiqueta} granularidad={granularidad} />
-              : <div className="tarjeta-vacia">Cargando…</div>}
+              : <div className="tarjeta-vacia">
+                  {cargando ? 'Cargando…' : 'Sin datos que comparar en este periodo'}
+                </div>}
           </div>
 
           {puntos.length > 0 && <TablaDatos puntos={puntos} granularidad={granularidad} />}

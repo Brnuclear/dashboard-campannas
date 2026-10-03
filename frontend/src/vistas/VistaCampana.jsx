@@ -87,6 +87,10 @@ export default function VistaCampana() {
   }, [granularidad, metrica])
 
   const puntos = useMemo(() => conMetricasDerivadas(datos?.puntos ?? []), [datos])
+  // Mismo criterio que en la vista por sucursal: una campana cuya ventana
+  // no toca el rango de fechas devuelve cero puntos, y eso no es "esta
+  // cargando".
+  const cargando = datos === null
   const metricaActual = METRICAS_FB.find((m) => m.campo === metrica)
   const info = datos?.campana
   const resumen = useMemo(() => resumenCampana(puntos, info, desde, hasta), [puntos, info, desde, hasta])
@@ -159,7 +163,9 @@ export default function VistaCampana() {
                 </div>
                 {puntos.length > 0
                   ? <GraficaLinea puntos={puntos} campo={metrica} etiqueta={metricaActual?.etiqueta} formateador={metricaActual?.formateador} granularidad={granularidad} />
-                  : <div className="tarjeta-vacia">Cargando…</div>}
+                  : <div className="tarjeta-vacia">
+                      {cargando ? 'Cargando…' : 'Esta campaña no corrió dentro del rango seleccionado'}
+                    </div>}
               </div>
 
               <div className="tarjeta">
@@ -167,7 +173,9 @@ export default function VistaCampana() {
                 <p className="subt">Por {granularidad}</p>
                 {puntos.length > 0
                   ? <GraficaBarras puntos={puntos} campo="solicitantes" granularidad={granularidad} />
-                  : <div className="tarjeta-vacia">Cargando…</div>}
+                  : <div className="tarjeta-vacia">
+                      {cargando ? 'Cargando…' : 'Sin solicitudes en este periodo'}
+                    </div>}
               </div>
 
               <div className="tarjeta">
@@ -175,7 +183,9 @@ export default function VistaCampana() {
                 <p className="subt">Por {granularidad} · comparación en una sola escala, no en pesos ni conteos</p>
                 {puntos.length > 0
                   ? <GraficaIndexada puntos={puntos} campoMetrica={metrica} etiquetaMetrica={metricaActual?.etiqueta} granularidad={granularidad} />
-                  : <div className="tarjeta-vacia">Cargando…</div>}
+                  : <div className="tarjeta-vacia">
+                      {cargando ? 'Cargando…' : 'Sin datos que comparar en este periodo'}
+                    </div>}
               </div>
 
               <p className="pie">
