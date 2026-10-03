@@ -154,32 +154,6 @@ export default function VistaSucursal() {
           </div>
 
           {puntos.length > 0 && <TablaDatos puntos={puntos} granularidad={granularidad} />}
-
-          <p className="pie">
-            ▼ marca el día en que se llenó una vacante (registro de nómina, no de la
-            solicitud); △ marca el día en que esa misma persona había enviado su
-            solicitud — el otro extremo del mismo viaje, casi siempre semanas antes.
-            El costo mostrado en ▼ es el gasto de Meta durante la ventana que
-            ese folio estuvo abierto — puede salir en $0 si se cubrió sin
-            publicidad corriendo, o repetirse entre dos contrataciones si sus
-            ventanas se traslapan. La tarjeta «Costo por contratación» de arriba
-            usa la versión agregada (gasto total del rango ÷ contrataciones del
-            rango) para evitar ese traslape. Ninguno de los dos marcadores incluye
-            Corporativo ni reasignaciones internas.
-            <br />
-            «Tasa de contratación» compara contrataciones y solicitantes del
-            mismo rango, no si esos solicitantes en particular fueron quienes se
-            contrataron — una contratación suele tardar días o semanas después
-            de la solicitud, así que es una relación del periodo, no de cohorte.
-            <br />
-            El alcance y la frecuencia solo se muestran a nivel día: Meta
-            deduplica el alcance por rango, sumarlo entre días infla el número.
-            Dos campañas que corrieron en Meta no tienen sucursal asignada en el
-            diccionario, así que no se pueden atribuir y quedan fuera de este
-            cruce. Cerro Azul todavía no tiene ninguna campaña registrada: su
-            sucursal existe y recibe solicitudes, pero nunca se le ha pagado
-            publicidad.
-          </p>
         </div>
 
         <PanelLateralFijo>

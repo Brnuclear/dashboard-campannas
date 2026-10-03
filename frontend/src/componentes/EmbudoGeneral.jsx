@@ -172,16 +172,6 @@ export default function EmbudoGeneral({ embudo, totales, anterior }) {
           ))}
         </div>
       </div>
-
-      <p className="pie">
-        La <strong>altura va en escala logarítmica</strong>: entre la primera etapa y la
-        última hay tres órdenes de magnitud, y en escala lineal las solicitudes medirían
-        menos de un pixel — justo la etapa que importa. Sirve para ver el orden y los
-        escalones, no para medir proporciones a ojo: para eso están los números, que son
-        el dato. Que el embudo se ensanche de alcance a impresiones —poco, porque la escala
-        logarítmica comprime ese salto— es correcto y no un error: a la misma persona se
-        le muestra el anuncio varias veces, y esa razón es la frecuencia.
-      </p>
     </div>
   )
 }

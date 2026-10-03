@@ -630,13 +630,6 @@ table.datos tfoot .fila-total td {
   color: var(--tinta);
 }
 
-.pie {
-  font-size: 12px;
-  color: var(--tinta-muda);
-  margin-top: 28px;
-  line-height: 1.6;
-}
-
 /* --- Encabezado de tabla con orden + filtro (tipo Excel) ---------------- */
 
 .th-contenido {

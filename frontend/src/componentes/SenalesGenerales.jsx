@@ -49,17 +49,6 @@ export default function SenalesGenerales({ senales }) {
           </tbody>
         </table>
       </div>
-
-      <p className="pie">
-        El veredicto de arriba lo deciden solo dos de estas señales: el volumen de
-        solicitudes atribuibles a campaña (lo que la empresa necesita) y las
-        solicitudes por cada 1,000 impresiones (si ese volumen vino de trabajar mejor
-        o nada más de pagar más). Las otras explican el resultado pero no votan: un
-        promedio de seis indicadores siempre sale «regular» y no sirve para decidir
-        nada. Un cambio de menos de 10% se reporta como «sin cambio» — con este
-        volumen, dos periodos consecutivos nunca salen idénticos ni haciendo
-        exactamente lo mismo.
-      </p>
     </div>
   )
 }

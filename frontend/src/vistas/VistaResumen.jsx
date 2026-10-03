@@ -7,7 +7,7 @@ import GraficaLinea from '../graficas/GraficaLinea'
 import GraficaBarras from '../graficas/GraficaBarras'
 import GraficaIndexada from '../graficas/GraficaIndexada'
 import { obtenerResumen } from '../api'
-import { formatoNumero, formatoDinero } from '../graficas/escalas'
+import { formatoNumero } from '../graficas/escalas'
 import { METRICAS_FB, conMetricasDerivadas, hoyISO, haceDiasISO } from '../configMetricas'
 
 // Atajos de rango. "Últimos 30 días" es el que trae la pestaña al abrir:
@@ -169,41 +169,6 @@ export default function VistaResumen() {
           </div>
 
           <SenalesGenerales senales={datos.senales} />
-
-          <p className="pie">
-            <strong>Solicitudes atribuibles</strong> son las que llegaron a una sucursal y
-            puesto que ese día tenía una campaña corriendo; el resto llegó sin anuncio
-            detrás (referidos, la vacante pegada en la sucursal). Las tasas de conversión y
-            el costo por solicitud usan solo las atribuibles — cargarle a la publicidad las
-            solicitudes espontáneas le regalaría un mérito que no es suyo. La gráfica de
-            barras, en cambio, muestra el total: son solicitudes que la empresa de verdad
-            recibió.
-            <br />
-            <strong>Usuarios alcanzados</strong> es la suma del alcance de cada día, y es
-            una <em>cota superior</em>: Meta deduplica el alcance solo dentro del rango que
-            se le pide como tal, así que quien vio el anuncio en dos días distintos está
-            contado dos veces. El día de mayor alcance del periodo fue{' '}
-            {formatoNumero(datos.totales.alcance_max_dia)} personas, y esa sí es una cota
-            inferior firme de personas distintas. La frecuencia ({'impresiones ÷ alcance'})
-            hereda la misma advertencia.
-            <br />
-            <strong>Resultados</strong> no mide lo mismo en todas las campañas: según el
-            objetivo son conversaciones de Messenger iniciadas o clics al enlace, y hay
-            campañas que cambiaron de objetivo a media historia. Se suma porque es un
-            conteo aditivo, pero el total mezcla dos cosas.
-            {datos.sin_diccionario.campanas > 0 && (
-              <>
-                <br />
-                <strong>{datos.sin_diccionario.campanas} campaña
-                {datos.sin_diccionario.campanas === 1 ? '' : 's'}</strong> corrió en Meta
-                durante este periodo sin sucursal ni puesto asignados en el diccionario, así
-                que no se puede atribuir y queda fuera de todos los números de arriba:{' '}
-                {formatoNumero(datos.sin_diccionario.impresiones)} impresiones y{' '}
-                {formatoDinero(datos.sin_diccionario.gasto)} de gasto que el tablero no
-                puede explicar. Se reporta aquí en lugar de callarlo.
-              </>
-            )}
-          </p>
         </>
       )}
     </>

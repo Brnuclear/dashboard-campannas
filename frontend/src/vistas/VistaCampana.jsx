@@ -15,6 +15,17 @@ import {
 import { formatoFecha } from '../graficas/escalas'
 import { METRICAS_FB, conMetricasDerivadas } from '../configMetricas'
 
+// Campana con la que abre la pestana. Se nombra a proposito en vez de
+// tomar la primera de la lista (que es la de arranque mas reciente, y
+// por lo mismo la que menos historia tiene que ensenar): esta lleva
+// meses corriendo, tiene contrataciones y solicitudes en cantidad, y es
+// la que mejor muestra para que sirve la vista.
+//
+// Si algun dia deja de existir -- se renombra, se borra del diccionario
+// -- no se rompe nada: se vuelve al comportamiento anterior, la primera
+// de la lista.
+const CAMPANA_POR_OMISION = 'SOLDADOR ALTAMIRA JULIO 08'
+
 export default function VistaCampana() {
   const [sucursales, setSucursales] = useState([])
   const [sucursalFiltro, setSucursalFiltro] = useState('Todas')
@@ -44,13 +55,17 @@ export default function VistaCampana() {
 
   // La lista de campanas depende del filtro de sucursal. Si la campana
   // que estaba elegida ya no aparece en la lista nueva (cambiaste de
-  // sucursal), se pasa a la primera disponible en vez de dejar elegida
-  // una campana que ya no calza con el filtro.
+  // sucursal), hay que elegir otra -- en ese orden: la de arranque, si
+  // esta en la lista; si no, la primera disponible.
   useEffect(() => {
     obtenerCampanas(sucursalFiltro)
       .then((lista) => {
         setCampanas(lista)
-        setCampana((actual) => (lista.some((c) => c.nombre_campana === actual) ? actual : (lista[0]?.nombre_campana ?? '')))
+        setCampana((actual) => {
+          if (lista.some((c) => c.nombre_campana === actual)) return actual
+          const preferida = lista.find((c) => c.nombre_campana === CAMPANA_POR_OMISION)
+          return preferida?.nombre_campana ?? lista[0]?.nombre_campana ?? ''
+        })
       })
       .catch((e) => setError(e.message))
   }, [sucursalFiltro])
@@ -187,18 +202,6 @@ export default function VistaCampana() {
                       {cargando ? 'Cargando…' : 'Sin datos que comparar en este periodo'}
                     </div>}
               </div>
-
-              <p className="pie">
-                Solicitantes y contrataciones se cuentan solo dentro de la ventana real
-                de esta campaña (fecha de inicio hasta fecha de fin, o hoy si sigue
-                corriendo) — aunque el filtro de fechas de arriba sea más amplio. El
-                costo por contratación usa únicamente el gasto de <strong>esta</strong>{' '}
-                campaña, no el de toda la sucursal — distinto de la vista por sucursal,
-                donde una contratación puede sumar el gasto de varias campañas que
-                coincidieron en el tiempo. ▼ marca contratación, △ marca la solicitud
-                de quien después se contrató. No incluye Corporativo ni reasignaciones
-                internas.
-              </p>
             </>
           )}
 

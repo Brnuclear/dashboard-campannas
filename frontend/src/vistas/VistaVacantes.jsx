@@ -76,15 +76,6 @@ export default function VistaVacantes() {
         <>
           <TarjetasResumenVacantes resumen={datos.resumen} />
           <TablaVacantes filas={filasFiltradas} />
-
-          <p className="pie">
-            Cada fila es un folio del sistema interno de reclutamiento (rh_campanas_reclutamiento),
-            no una campaña de Meta — por eso no tiene filtro de fechas ni se cruza con gasto de
-            ads. <strong>Activa</strong>: sin fecha de ingreso todavía. <strong>Cubierta</strong>:
-            se llenó con una contratación nueva. <strong>Reasignación</strong>: se llenó con alguien
-            que ya trabajaba en la empresa desde antes, no cuenta como contratación nueva ni entra
-            al tiempo promedio de cobertura. No incluye Corporativo.
-          </p>
         </>
       )}
     </>
