@@ -21,6 +21,8 @@ services:
     # hilos no se estorban. Mas workers solo gastarian la memoria del
     # plan gratuito.
     startCommand: gunicorn backend.app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4
-    envVars:
-      - key: PYTHON_VERSION
-        value: "3.12.7"
+    # Sin PYTHON_VERSION a proposito: fijar una version exacta (3.12.7)
+    # revienta el build si Render no tiene ese parche disponible, y aqui
+    # no hace falta ninguna version en particular -- el codigo corre en
+    # cualquier Python 3.11 o mas nuevo, que es lo que trae Render por
+    # omision.
