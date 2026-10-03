@@ -1,0 +1,1372 @@
+/* Tokens tomados literalmente de REGLAS_VISUALES.md (marca, neutros).
+   --serie-solicitantes es la unica adicion propia de este tablero: se
+   corrio node scripts/validate_palette.js "#098bcb,#c9622a" --pairs all
+   antes de usarla -- pasa banda de luminosidad, piso de croma, separacion
+   CVD (protan/deuter/tritan) y contraste contra la superficie. No es un
+   color "a ojo". */
+:root {
+  color-scheme: light; /* el tablero no sigue el tema del sistema, a proposito */
+
+  --marca-claro: #7fc4e3;   /* solo tintes de fondo -- nunca texto ni serie */
+  --marca-medio: #098bcb;   /* filetes, bordes, foco; serie de Facebook */
+  --marca-fuerte: #001689;  /* todo el texto de acento */
+
+  --serie-solicitantes: #c9622a;  /* serie de Solicitantes -- validada junto con --marca-medio */
+
+  --plano: #f9f9f7;
+  --superficie: #fcfcfb;
+  --tinta: #0b0b0b;
+  --tinta-2: #52514e;
+  --tinta-muda: #898781;
+  --rejilla: #e1e0d9;
+  --eje: #c3c2b7;
+  --borde: rgba(11, 11, 11, 0.10);
+
+  --banda-cabecera: #c8e4f1;
+  --anillo-foco: rgba(9, 139, 203, 0.45);
+
+  /* Estado (REGLAS_VISUALES.md R5/R6): solo para senalar estatus -- NUNCA
+     como color de serie ni tenido de azul de marca. Relleno/texto son dos
+     variantes distintas, no intercambiables (R5). */
+  --bien: #0ca30c;
+  --bien-texto: #006300;
+  --bien-pastilla: #cceacb;
+  --alerta: #fab219;
+  --alerta-texto: #7a5000;
+  --alerta-pastilla: #fcedce;
+  --critico: #d03b3b;
+  --critico-texto: #b52121;
+  --critico-pastilla: #f3d5d5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--plano);
+  color: var(--tinta);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.app {
+  max-width: 1400px; /* antes 1080px: la pestana por campana necesita la columna del ranking */
+  margin: 0 auto;
+  padding: 0 20px 48px;
+}
+
+/* --- Cabecera ------------------------------------------------------- */
+
+.cabecera {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 4px;
+  border-bottom: 2px solid var(--marca-medio);
+  margin-bottom: 24px;
+}
+
+/* Marca generica de la version de demostracion: no hay logotipo de
+   empresa en este paquete. Las tres barras usan los mismos tres colores
+   de serie que el resto del tablero, asi que la cabecera anuncia la
+   paleta en vez de competir con ella. */
+.cabecera-marca {
+  flex: none;
+}
+
+.cabecera h1 {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--marca-fuerte);
+  margin: 0;
+}
+
+.cabecera p {
+  font-size: 13px;
+  color: var(--tinta-2);
+  margin: 2px 0 0;
+}
+
+/* --- Pestanas: por sucursal / por campana ----------------------------- */
+
+.pestanas {
+  display: flex;
+  gap: 4px;
+  margin: -24px 0 22px; /* pegado al filete de la cabecera, sin hueco */
+}
+
+.pestanas button {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tinta-2);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 10px 14px 8px;
+  margin-bottom: -2px; /* se monta sobre el filete de la cabecera */
+  cursor: pointer;
+}
+
+.pestanas button.activa {
+  color: var(--marca-fuerte);
+  border-bottom-color: var(--marca-medio);
+}
+
+.pestanas button:hover:not(.activa) {
+  color: var(--tinta);
+}
+
+.pestanas button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--anillo-foco);
+  border-radius: 4px;
+}
+
+/* --- Filtros: una sola fila, encima de las graficas ------------------ */
+
+.filtros {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+}
+
+.filtro-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filtro-grupo label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--marca-fuerte);
+}
+
+.filtro-grupo select,
+.filtro-grupo input[type="date"] {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--tinta);
+  background: var(--superficie);
+  border: 1px solid rgba(9, 139, 203, 0.32);
+  border-radius: 7px;
+  padding: 7px 10px;
+}
+
+.filtro-campana select {
+  min-width: 220px;
+}
+
+.filtro-grupo select:focus,
+.filtro-grupo input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--anillo-foco);
+}
+
+.segmentado {
+  display: inline-flex;
+  border: 1px solid rgba(9, 139, 203, 0.32);
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.segmentado button {
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--tinta-2);
+  background: var(--superficie);
+  border: none;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.segmentado button + button {
+  border-left: 1px solid rgba(9, 139, 203, 0.32);
+}
+
+.segmentado button[aria-pressed="true"] {
+  background: var(--banda-cabecera);
+  color: var(--marca-fuerte);
+}
+
+.segmentado button:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--anillo-foco);
+}
+
+/* --- Tarjetas de resumen (stat tiles) ------------------------------------
+   Tipografia calcada de REGLAS_VISUALES.md: "etiqueta de tarjeta" y
+   "cifra de tarjeta" son las mismas specs que ya usa la ficha de sucursal
+   del otro proyecto, para no inventar una escala nueva. */
+
+.tarjetas-resumen {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 760px) {
+  .tarjetas-resumen {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat-tile {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 16px 20px 14px;
+}
+
+.stat-etiqueta {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--marca-fuerte);
+  margin-bottom: 6px;
+}
+
+.stat-valor {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--tinta);
+}
+
+.stat-pie {
+  font-size: 12.5px;
+  color: var(--tinta-2);
+  margin-top: 6px;
+}
+
+/* --- Tarjeta de grafica ------------------------------------------------ */
+
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 16px 18px 12px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.tarjeta h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--marca-fuerte);
+  margin: 0 0 2px;
+}
+
+.tarjeta .subt {
+  font-size: 12.5px;
+  color: var(--tinta-muda);
+  margin: 0 0 10px;
+}
+
+.tarjeta-vacia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  color: var(--tinta-muda);
+  font-size: 13.5px;
+}
+
+/* --- Leyenda de la grafica indexada (solido vs. punteado, mismo color) -- */
+
+.leyenda-indexada {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--tinta-2);
+  padding: 10px 4px 2px;
+  border-top: 1px solid var(--rejilla);
+  margin-top: 4px;
+}
+
+.leyenda-indexada .item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.leyenda-indexada .clave-linea {
+  width: 26px;
+  height: 4px;
+  background: var(--marca-medio);
+  flex: none;
+}
+
+.leyenda-indexada .clave-linea.punteada {
+  background: repeating-linear-gradient(
+    to right, var(--marca-medio) 0 6px, transparent 6px 11px
+  );
+}
+
+.leyenda-indexada .clave-linea.naranja {
+  background: repeating-linear-gradient(
+    to right, var(--serie-solicitantes) 0 6px, transparent 6px 11px
+  );
+}
+
+.leyenda-indexada .clave-marcador {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 8px solid var(--tinta);
+  flex: none;
+}
+
+.leyenda-indexada .clave-marcador-svg {
+  flex: none;
+}
+
+/* --- Resumen de campanas activas en el rango ---------------------------- */
+
+.campanas-resumen {
+  font-size: 12.5px;
+  color: var(--tinta-2);
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+
+.campanas-resumen strong {
+  color: var(--marca-fuerte);
+  font-weight: 700;
+}
+
+/* --- Selector de metrica de Facebook (chips) -------------------------- */
+
+.chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.chip {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--tinta-2);
+  background: var(--plano);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+}
+
+.chip[aria-pressed="true"] {
+  background: var(--marca-medio);
+  color: #fff;
+  border-color: var(--marca-medio);
+}
+
+.chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* --- Ejes / gridlines --------------------------------------------------- */
+
+.eje-texto {
+  font-size: 11.5px;
+  fill: var(--tinta-2);
+}
+
+.rejilla-linea {
+  stroke: var(--rejilla);
+  stroke-width: 1;
+}
+
+.eje-linea {
+  stroke: var(--eje);
+  stroke-width: 1;
+}
+
+/* --- Tooltip ------------------------------------------------------------ */
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--tinta);
+  color: #fff;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(11, 11, 11, 0.28);
+  z-index: 10;
+  max-width: 260px;
+}
+
+.tooltip .fecha {
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+  display: block;
+}
+
+.tooltip .fila {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tooltip .clave {
+  width: 10px;
+  height: 2px;
+  background: var(--clave-color, var(--marca-medio));
+  flex: none;
+}
+
+.tooltip .clave.punteada {
+  background: repeating-linear-gradient(
+    to right, var(--clave-color, var(--marca-medio)) 0 3px, transparent 3px 5px
+  );
+}
+
+.tooltip .valor {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tooltip .nombre {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* --- Tabla de datos (vista alterna) ---------------------------------------
+   Tokens de tabla calcados de REGLAS_VISUALES.md (cabecera, rejilla, fila
+   alterna, fila TOTAL) -- antes esta tabla usaba un estilo generico propio,
+   no el que ya estaba definido para tablas en el sistema visual. */
+
+.tabla-alterna summary {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--marca-medio);
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.tabla-barra {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.tabla-nota {
+  font-size: 11.5px;
+  color: var(--tinta-muda);
+  margin: 6px 2px 0;
+}
+
+/* --- Selector de columnas visibles --------------------------------------- */
+
+.selector-columnas {
+  position: relative;
+}
+
+.selector-columnas-boton {
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--marca-medio);
+  background: var(--plano);
+  border: 1px solid rgba(9, 139, 203, 0.32);
+  border-radius: 7px;
+  padding: 6px 11px;
+  cursor: pointer;
+}
+
+.selector-columnas-panel {
+  position: absolute;
+  z-index: 15;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 220px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--superficie);
+  border: 1px solid rgba(9, 139, 203, 0.32);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(11, 11, 11, 0.22);
+  padding: 8px;
+}
+
+.selector-columnas-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.selector-columnas-panel li label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--tinta);
+  padding: 5px 4px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.selector-columnas-panel li label:hover {
+  background: var(--plano);
+}
+
+.selector-columnas-panel li label.fija {
+  color: var(--tinta-muda);
+  cursor: default;
+}
+
+.selector-columnas-panel li label.fija:hover {
+  background: none;
+}
+
+.tabla-scroll {
+  overflow: auto;
+  max-height: 480px;
+  margin-top: 10px;
+  border: 1px solid rgba(9, 139, 203, 0.32);
+  border-radius: 10px;
+}
+
+table.datos {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+table.datos th,
+table.datos td {
+  padding: 7px 10px;
+  text-align: center;
+  border-bottom: 1px solid rgba(9, 139, 203, 0.20);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Antes forzaba texto a la izquierda; ahora todo se centra parejo (mas
+   facil de leer en una fila), asi que solo le queda relajar el ancho
+   tabular y permitir que el texto envuelva -- ya no controla alineacion. */
+table.datos .alinear-izq {
+  font-variant-numeric: normal;
+  white-space: normal;
+}
+
+/* Cabecera: la fila de grupos ("Facebook" / "Solicitantes") se desplaza
+   con el cuerpo; solo la fila de columnas -- la que trae los clics de
+   orden -- queda fija arriba al hacer scroll, para no tener que resolver
+   el offset acumulado de dos filas sticky apiladas. */
+table.datos thead th {
+  background: #d2e9f3;
+  color: var(--marca-fuerte);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+table.datos thead tr:last-child th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 2px solid var(--marca-medio);
+  cursor: pointer;
+  user-select: none;
+}
+
+table.datos thead tr:last-child th:hover {
+  background: #c2e0ee;
+}
+
+.flecha-orden {
+  color: var(--marca-medio);
+  font-size: 10px;
+}
+
+table.datos tbody tr:nth-child(even) {
+  background: rgba(127, 196, 227, 0.09);
+}
+
+table.datos tr.fila-contratacion {
+  box-shadow: inset 3px 0 0 var(--tinta);
+}
+
+.marca-fila {
+  color: var(--tinta);
+  font-size: 10px;
+}
+
+/* Nombres + costo + fecha de solicitud es texto largo -- que se extienda
+   la tabla con scroll horizontal en vez de partir palabras a la mitad. */
+table.datos .col-contrataciones {
+  white-space: nowrap;
+  min-width: 320px;
+}
+
+table.datos tfoot .fila-total td {
+  background: rgba(127, 196, 227, 0.26);
+  border-top: 2px solid var(--marca-medio);
+  border-bottom: none;
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+.pie {
+  font-size: 12px;
+  color: var(--tinta-muda);
+  margin-top: 28px;
+  line-height: 1.6;
+}
+
+/* --- Encabezado de tabla con orden + filtro (tipo Excel) ---------------- */
+
+.th-contenido {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.th-etiqueta {
+  cursor: pointer;
+}
+
+.th-filtro {
+  position: relative;
+  flex: none;
+}
+
+.boton-filtro-columna {
+  font-family: inherit;
+  font-size: 10px;
+  color: var(--marca-fuerte);
+  background: none;
+  border: none;
+  padding: 2px 3px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+.boton-filtro-columna:hover,
+.boton-filtro-columna[aria-expanded="true"] {
+  opacity: 1;
+  background: rgba(9, 139, 203, 0.16);
+}
+
+.boton-filtro-columna.activo {
+  opacity: 1;
+  color: var(--marca-medio);
+}
+
+.panel-filtro-columna {
+  /* position:fixed + top/left en px, calculados y acotados al viewport en
+     JS desde el boton que lo abre (ver EncabezadoFiltrable.jsx) -- se
+     monta via portal en document.body, asi que estas coordenadas son de
+     PANTALLA, no relativas a ningun ancestro con overflow. */
+  position: fixed;
+  z-index: 100;
+  width: 220px;
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  background: var(--superficie);
+  border: 1px solid rgba(9, 139, 203, 0.32);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(11, 11, 11, 0.22);
+  padding: 8px;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+  cursor: default;
+}
+
+.panel-filtro-columna input[type="text"] {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--tinta);
+  background: var(--plano);
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 6px 9px;
+  margin-bottom: 6px;
+}
+
+.panel-filtro-columna input[type="text"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--anillo-foco);
+}
+
+.panel-filtro-acciones {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.panel-filtro-acciones button {
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--marca-medio);
+  background: var(--plano);
+  border: 1px solid var(--borde);
+  border-radius: 5px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+.panel-filtro-columna ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  border-top: 1px solid var(--rejilla);
+  border-bottom: 1px solid var(--rejilla);
+}
+
+.panel-filtro-columna li {
+  padding: 1px 0;
+}
+
+.panel-filtro-columna li label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--tinta);
+  padding: 4px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.panel-filtro-columna li label:hover {
+  background: var(--plano);
+}
+
+.panel-filtro-vacio {
+  font-size: 12px;
+  color: var(--tinta-muda);
+  padding: 6px 4px;
+}
+
+.panel-filtro-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.panel-filtro-footer button {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.panel-filtro-footer button:not(.primario) {
+  color: var(--tinta-2);
+  background: none;
+  border: 1px solid var(--borde);
+}
+
+.panel-filtro-footer button.primario {
+  color: #fff;
+  background: var(--marca-medio);
+  border: 1px solid var(--marca-medio);
+}
+
+/* --- Layout de dos columnas + panel de ranking (Por sucursal, Por campana)
+   .ranking-panel es position:sticky: empieza en su lugar normal del grid
+   (a la altura de donde arranca el contenido principal, justo debajo de
+   la barra de filtros -- no pegado al borde del navegador) y se fija
+   cerca del tope de la pantalla solo cuando el scroll lo sacaria de
+   vista. Se probo position:fixed antes (independiente del scroll desde
+   el arranque) pero eso lo dejaba congelado en un punto fijo mientras el
+   resto de la pagina se seguia moviendo, con un hueco vacio creciendo
+   arriba conforme se bajaba -- sticky resuelve las dos cosas: no arranca
+   pegado al borde de la ventana, y tampoco se queda inmovil en un punto
+   arbitrario. */
+
+.campana-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .campana-layout {
+    grid-template-columns: 1fr; /* el panel baja debajo del contenido, no desaparece */
+  }
+}
+
+.campana-principal {
+  min-width: 0; /* si no, las graficas/tabla anchas empujan la columna del panel */
+}
+
+.ranking-panel {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+.ranking-tabla {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 14px 14px 6px;
+}
+
+.ranking-tabla h3 {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--marca-fuerte);
+  margin: 0 0 6px;
+}
+
+.ranking-tabla ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ranking-tabla li + li {
+  border-top: 1px solid var(--rejilla);
+}
+
+/* el primer lugar se distingue con el mismo tinte que ya usa el resto del
+   tablero para "esto esta activo/seleccionado" -- no un color nuevo. */
+.ranking-tabla li:first-child button {
+  background: var(--banda-cabecera);
+}
+
+.ranking-tabla li.activa button {
+  box-shadow: inset 0 0 0 1.5px var(--marca-medio);
+}
+
+.ranking-tabla button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: none;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  padding: 7px 6px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.ranking-tabla li:not(:first-child) button:hover {
+  background: var(--plano);
+}
+
+.ranking-num {
+  flex: none;
+  width: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--tinta-muda);
+}
+
+.ranking-nombre {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 12px;
+  color: var(--tinta);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-sucursal {
+  font-size: 10.5px;
+  color: var(--tinta-muda);
+}
+
+.ranking-valor {
+  flex: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--marca-fuerte);
+  font-variant-numeric: tabular-nums;
+}
+
+.ranking-vacio {
+  font-size: 12px;
+  color: var(--tinta-muda);
+  margin: 0 0 8px;
+}
+
+.ranking-nota {
+  font-size: 11px;
+  color: var(--tinta-muda);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* --- Vista de vacantes ------------------------------------------------- */
+
+/* Pastilla neutra para encerrar la cifra de una columna clave de una
+   tabla -- mismo valor (#d7ebf4 de fondo, --tinta de texto) que la
+   "pastilla neutra" ya documentada en REGLAS_VISUALES.md para tablas de
+   otro componente del mismo sistema, reutilizado tal cual. No lleva
+   color de estado (R6): solo marca "este dato es clave", no un semaforo. */
+.pastilla-cifra {
+  display: inline-block;
+  background: #d7ebf4;
+  color: var(--tinta);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.pastilla-estatus {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--tinta);
+  white-space: nowrap;
+}
+
+/* activa = pendiente de cubrir, se quiere que resalte (R5/R6: colores de
+   estado, nunca de marca). cubierta = resuelta. reasignacion no es ni
+   una cosa ni la otra -- un tercer estatus neutro, sin semaforo. */
+.pastilla-estatus.activa {
+  background: var(--alerta-pastilla);
+}
+
+.pastilla-estatus.cubierta {
+  background: var(--bien-pastilla);
+}
+
+.pastilla-estatus.reasignacion {
+  background: var(--rejilla);
+  color: var(--tinta-2);
+}
+
+.etiqueta-baja-especial {
+  font-style: italic;
+  color: var(--tinta-muda);
+}
+
+/* --- Marco de decision por campana (vista Por campana) ------------------ */
+
+.matriz-decision {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 6px;
+}
+
+@media (max-width: 760px) {
+  .matriz-decision {
+    grid-template-columns: 1fr;
+  }
+}
+
+.matriz-celda {
+  border-radius: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--borde);
+}
+
+.matriz-celda.bien { background: var(--bien-pastilla); border-color: rgba(12, 163, 12, 0.28); }
+.matriz-celda.alerta { background: var(--alerta-pastilla); border-color: rgba(250, 178, 25, 0.32); }
+.matriz-celda.critico { background: var(--critico-pastilla); border-color: rgba(208, 59, 59, 0.28); }
+.matriz-celda.neutra { background: var(--superficie); }
+
+.matriz-condicion {
+  display: block;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11px;
+  color: var(--tinta-muda);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.matriz-celda h4 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tinta);
+}
+
+.matriz-celda p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--tinta-2);
+  line-height: 1.5;
+}
+
+.pastilla-decision {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  color: var(--tinta);
+}
+
+.pastilla-decision.bien { background: var(--bien-pastilla); }
+.pastilla-decision.alerta { background: var(--alerta-pastilla); }
+.pastilla-decision.critico { background: var(--critico-pastilla); }
+.pastilla-decision.neutra { background: var(--rejilla); color: var(--tinta-2); }
+
+table.datos .col-motivo {
+  white-space: normal;
+  min-width: 280px;
+  max-width: 380px;
+  font-size: 12.5px;
+  color: var(--tinta-2);
+}
+
+/* --- Selector con busqueda (reemplaza <select> nativo) ------------------ */
+
+.selector-busqueda {
+  position: relative;
+}
+
+.selector-busqueda-boton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 180px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--tinta);
+  background: var(--superficie);
+  border: 1px solid rgba(9, 139, 203, 0.32);
+  border-radius: 7px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+.selector-busqueda-boton:focus-visible,
+.selector-busqueda-boton[aria-expanded="true"] {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--anillo-foco);
+}
+
+.selector-busqueda-flecha {
+  color: var(--marca-medio);
+  font-size: 11px;
+  flex: none;
+}
+
+.selector-busqueda-panel {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  width: max-content;
+  max-width: 320px;
+  background: var(--superficie);
+  border: 1px solid rgba(9, 139, 203, 0.32);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(11, 11, 11, 0.18);
+  padding: 8px;
+}
+
+.selector-busqueda-panel input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--tinta);
+  background: var(--plano);
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  padding: 6px 9px;
+  margin-bottom: 6px;
+}
+
+.selector-busqueda-panel input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--anillo-foco);
+}
+
+.selector-busqueda-panel ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.selector-busqueda-panel li button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--tinta);
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.selector-busqueda-panel li button.resaltada {
+  background: var(--banda-cabecera);
+}
+
+.selector-busqueda-check {
+  color: var(--marca-medio);
+  font-weight: 700;
+  flex: none;
+}
+
+.selector-busqueda-vacio {
+  font-size: 13px;
+  color: var(--tinta-muda);
+  padding: 6px 8px;
+}
+
+/* --- Pestana Resumen ----------------------------------------------------
+   Tres bloques nuevos: la banda de veredicto, la cadena del embudo y el
+   delta contra el periodo anterior. Ninguno inventa color: todos salen
+   de los tokens de estado que ya estaban declarados arriba, y ninguno
+   usa el color como unica senal (REGLAS_VISUALES.md R8) -- el veredicto
+   trae la palabra, el delta trae la flecha y el porcentaje con signo. */
+
+.veredicto {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-left: 5px solid var(--eje);
+  border-radius: 10px;
+  padding: 14px 20px 16px;
+  margin-bottom: 20px;
+}
+
+.veredicto.bien    { border-left-color: var(--bien);    background: linear-gradient(90deg, var(--bien-pastilla) 0%, var(--superficie) 42%); }
+.veredicto.alerta  { border-left-color: var(--alerta);  background: linear-gradient(90deg, var(--alerta-pastilla) 0%, var(--superficie) 42%); }
+.veredicto.critico { border-left-color: var(--critico); background: linear-gradient(90deg, var(--critico-pastilla) 0%, var(--superficie) 42%); }
+.veredicto.neutra  { border-left-color: var(--eje); }
+
+.veredicto-cabeza {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.veredicto-icono {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.veredicto.bien .veredicto-icono    { color: var(--bien-texto); }
+.veredicto.alerta .veredicto-icono  { color: var(--alerta-texto); }
+.veredicto.critico .veredicto-icono { color: var(--critico-texto); }
+.veredicto.neutra .veredicto-icono  { color: var(--tinta-muda); }
+
+.veredicto-titulo {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--marca-fuerte);
+}
+
+.veredicto-resumen {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--tinta);
+  margin: 7px 0 0;
+  max-width: 92ch;
+}
+
+.veredicto-rango {
+  font-size: 12.5px;
+  color: var(--tinta-2);
+  margin: 8px 0 0;
+}
+
+/* --- Embudo horizontal de cuatro etapas -------------------------------
+   Tres franjas alineadas a la misma rejilla de columnas: los
+   encabezados (nombre, cifra, delta), la banda del embudo en SVG, y las
+   notas. La rejilla la define --embudo-columnas desde el componente, no
+   un 4 escrito aqui: si un dia el embudo gana o pierde una etapa, el CSS
+   no se entera. */
+
+.embudo {
+  margin: 10px 0 2px;
+}
+
+.embudo-fila {
+  display: grid;
+  grid-template-columns: repeat(var(--embudo-columnas, 4), 1fr);
+  gap: 0;
+}
+
+.embudo-encabezados > div {
+  padding: 0 14px 10px 0;
+  border-left: 3px solid var(--marca-medio);
+  padding-left: 12px;
+}
+
+/* La ultima etapa es la unica que no la reporta Meta: va en el naranja
+   de la serie de Solicitantes, el mismo que ya usan todas las graficas
+   del tablero para esa misma cosa. El filete de color y la pastilla de
+   fuente estan arriba de cada columna, asi que cada bloque del embudo
+   queda etiquetado directamente -- no hace falta una leyenda aparte ni
+   depender del color para saber quien reporta que. */
+.embudo-encabezados > div.empresa {
+  border-left-color: var(--serie-solicitantes);
+}
+
+.embudo-encabezado {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 2px;
+}
+
+.embudo-nombre {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--marca-fuerte);
+}
+
+.embudo-fuente {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--tinta-2);
+  background: var(--rejilla);
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
+.embudo-encabezados > div.empresa .embudo-fuente {
+  background: #f4ddd0; /* tinte del naranja de serie; solo fondo, nunca texto */
+}
+
+.embudo-valor {
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--tinta);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+/* El cociente de cada paso va dentro del SVG, pegado a la union de los
+   dos bloques que relaciona: pertenece al paso, no a ninguna de las dos
+   etapas. */
+.embudo-cociente-svg {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--tinta-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.embudo-notas {
+  margin-top: 4px;
+}
+
+.embudo-notas p {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--tinta-2);
+  margin: 0;
+  padding: 0 14px 0 12px;
+  border-left: 1px solid var(--rejilla);
+}
+
+.embudo-cociente-nota {
+  color: var(--tinta);
+  font-variant-numeric: tabular-nums;
+}
+
+/* En pantalla angosta el embudo no cabe en cuatro columnas: los
+   encabezados y las notas pasan a dos, y la banda del SVG -- que si
+   escala -- se queda como resumen visual del paso completo. */
+@media (max-width: 860px) {
+  .embudo-fila {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 12px;
+  }
+
+  .embudo-valor {
+    font-size: 22px;
+  }
+}
+
+/* --- Delta contra el periodo anterior ---------------------------------- */
+
+.delta {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta-2);
+}
+
+.delta.bien    { color: var(--bien-texto); }
+.delta.critico { color: var(--critico-texto); }
+.delta.alerta  { color: var(--alerta-texto); }
+.delta.neutra  { color: var(--tinta-2); }
+
+.delta-nota {
+  font-weight: 400;
+  color: var(--tinta-muda);
+}
+
+/* --- Segunda fila de tarjetas: contexto, no resultado ------------------ */
+/* Cifra mas chica a proposito: el embudo de arriba es el resultado, esto
+   es lo que costo. La jerarquia la hace el tamano, no el color. */
+.tarjetas-resumen.secundaria .stat-valor {
+  font-size: 24px;
+}

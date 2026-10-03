@@ -1,0 +1,26 @@
+# Despliegue en Render (https://render.com) como "Blueprint": con este
+# archivo en la raiz del repositorio, Render arma el servicio solo y no
+# hay que llenar ningun formulario a mano.
+#
+# El plan gratuito duerme el servicio despues de 15 minutos sin visitas
+# y la siguiente visita espera ~40 segundos a que despierte. Para un
+# tablero que se abre de vez en cuando esta bien; si la primera
+# impresion importa, PythonAnywhere no duerme los suyos (ver README).
+services:
+  - type: web
+    name: tablero-campannas
+    runtime: python
+    plan: free
+    # La base se vuelve a generar en cada despliegue: asi las fechas de
+    # la demo quedan ancladas al dia del deploy y el tablero nunca se ve
+    # vencido. Es un archivo sintetico, no hay nada que conservar entre
+    # versiones.
+    buildCommand: pip install -r requirements.txt && python datos/generar_datos_demo.py
+    # Un worker con cuatro hilos: las consultas mas pesadas tardan ~90 ms
+    # y cada una abre su propia conexion de solo lectura, asi que los
+    # hilos no se estorban. Mas workers solo gastarian la memoria del
+    # plan gratuito.
+    startCommand: gunicorn backend.app:app --bind 0.0.0.0:$PORT --workers 1 --threads 4
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"

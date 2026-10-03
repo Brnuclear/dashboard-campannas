@@ -1,0 +1,11 @@
+# Lo que necesita la version de demostracion. No hay driver de base de
+# datos: sqlite3 viene en la biblioteca estandar de Python, y esta
+# version no se conecta a ningun servidor.
+Flask>=3.0
+
+# Solo para el despliegue. El servidor de desarrollo de Flask
+# (app.run) no esta hecho para recibir trafico de internet: un
+# proceso, sin limites de tiempo, y lo dice el propio Flask al
+# arrancar. En local no hace falta instalarlo -- gunicorn no corre en
+# Windows, y pip lo salta solo por el marcador de plataforma.
+gunicorn>=23.0 ; sys_platform != "win32"

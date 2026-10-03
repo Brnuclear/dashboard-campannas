@@ -1,0 +1,8 @@
+# Normaliza los fines de linea: en el repositorio siempre LF, en el disco
+# de cada quien lo que su sistema use. Sin esto, un commit hecho en
+# Windows marca como modificado todo archivo que toco, aunque no haya
+# cambiado nada.
+* text=auto eol=lf
+
+# La base de la demo es binaria: que git no intente "normalizarla".
+*.sqlite binary

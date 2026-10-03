@@ -1,0 +1,28 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+
+# 'dist' NO se ignora aqui, al reves de lo que trae Vite por omision:
+# el servidor solo instala Python (ver render.yaml), asi que el bundle
+# compilado viaja en el repositorio. Despues de tocar algo de src/ hay
+# que correr 'npm run build' y versionar el resultado.
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
